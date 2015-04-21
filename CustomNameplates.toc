@@ -1,0 +1,5 @@
+## Title: CustomNameplates
+## Interface: 11200
+## Version: 1.0b
+
+CustomNameplates.xml
