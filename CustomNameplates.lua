@@ -32,7 +32,7 @@ local blacklist = {
 	},
 	["containsName"] = {
 		-- There is a space before totem so that players with "totem" in the name is not included.
-		[" totem"] = true
+		" totem"
 	}
 }
 
@@ -259,9 +259,10 @@ function CustomNameplates_OnUpdate()
 				Level:Hide()
 			end
 			
-			for cName, ____ in ipairs(blacklist["containsName"])
+			
+			for nr, cName in ipairs(blacklist["containsName"])
 			do
-				if string.find(string.lower(Name:GetText()), cName)
+				if string.find(string.lower(Name:GetText()), cName) ~= nil
 				then
 					HealthBar:Hide()
 					Name:Hide()
@@ -270,18 +271,6 @@ function CustomNameplates_OnUpdate()
 			end
 			
 			
-			
-			local blacklist = {
-				["exactName"] = {
-					["fire nova totem"] = true
-				},
-				["containsName"] = {
-					-- There is a space before totem so that players with "totem" in the name is not included.
-					[" totem"] = true
-				}
-			}
-			
-
 			local red, green, blue, _ = Name:GetTextColor() --Set Color of Namelabel
 			-- Print(red.." "..green.." "..blue)
 			if red > 0.99 and green == 0 and blue == 0 then
