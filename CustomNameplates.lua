@@ -3,7 +3,10 @@ local showPets      = false
 local enableAddOn   = true
 local showFriendly  = false
 local showClassIcon = false
-
+local healthBarWidth = 140;
+local helthBarHeight = 12;
+			
+			
 --Don't edit
 local currentDebuffs = {}
 
@@ -20,6 +23,17 @@ local Icons = {
 	["Shaman"] = "Interface\\AddOns\\CustomNameplates\\Class\\ClassIcon_Shaman",
 	["Warlock"] = "Interface\\AddOns\\CustomNameplates\\Class\\ClassIcon_Warlock",
 	["Warrior"] = "Interface\\AddOns\\CustomNameplates\\Class\\ClassIcon_Warrior",
+}
+
+-- All names should be in full lower case. All checks against the list should be done with string.lower();
+local blacklist = {
+	["exactName"] = {
+		["fire nova totem"] = true,
+	},
+	["containsName"] = {
+		-- There is a space before totem so that players with "totem" in the name is not included.
+		[" totem"] = true
+	}
 }
 
 function cnpHandleEvent(event) --Handles wow events
@@ -129,13 +143,13 @@ function CustomNameplates_OnUpdate()
 			HealthBar:SetStatusBarTexture("Interface\\AddOns\\CustomNameplates\\barSmall")
 			HealthBar:ClearAllPoints()
 			HealthBar:SetPoint("CENTER", namePlate, "CENTER", 0, -10)
-			HealthBar:SetWidth(100) --Edit this for width of the healthbar
-			HealthBar:SetHeight(7) --Edit this for height of the healthbar
+			HealthBar:SetWidth(healthBarWidth) --Edit this for width of the healthbar
+			HealthBar:SetHeight(helthBarHeight) --Edit this for height of the healthbar
 			
 			--HealthbarBackground
 			if HealthBar.bg == nil then
 				HealthBar.bg = HealthBar:CreateTexture(nil, "BORDER")
-				HealthBar.bg:SetTexture(0,0,0,0.85)
+				HealthBar.bg:SetTexture(0.2,0.2,0.2,0.8)
 				HealthBar.bg:ClearAllPoints()
 				HealthBar.bg:SetPoint("CENTER", namePlate, "CENTER", 0, -10)
 				HealthBar.bg:SetWidth(HealthBar:GetWidth() + 1.5)
@@ -144,9 +158,9 @@ function CustomNameplates_OnUpdate()
 									
 			--RaidTarget
 			RaidTargetIcon:ClearAllPoints()
-			RaidTargetIcon:SetWidth(15) --Edit this for width of the raidicon
-			RaidTargetIcon:SetHeight(15) --Edit this for height of the raidicon
-			RaidTargetIcon:SetPoint("BOTTOMLEFT", HealthBar, "BOTTOMLEFT", -18, -4) --Last two parameters are x,y coords for position relative to Healthbar 
+			RaidTargetIcon:SetWidth(32) --Edit this for width of the raidicon
+			RaidTargetIcon:SetHeight(32) --Edit this for height of the raidicon
+			RaidTargetIcon:SetPoint("CENTER", HealthBar, "CENTER", 0, 40) --Last two parameters are x,y coords for position relative to Healthbar 
 			
 			
 			if namePlate.debuffIcons == nil then
@@ -217,7 +231,7 @@ function CustomNameplates_OnUpdate()
 			Glow:Hide()
 			
 			Name:SetFontObject(GameFontNormal)
-			Name:SetFont("Interface\\AddOns\\CustomNameplates\\Fonts\\Ubuntu-C.ttf",13)
+			Name:SetFont("Interface\\AddOns\\CustomNameplates\\Fonts\\Ubuntu-C.ttf",20)
 			Name:SetPoint("BOTTOM", namePlate, "CENTER", 0, -4)
 			
 			Level:SetFontObject(GameFontNormal)
@@ -235,6 +249,37 @@ function CustomNameplates_OnUpdate()
 					Level:Hide()
 				end
 			end
+			
+			
+			-- Check if blacklisted by exact name.
+			if blacklist["exactName"][string.lower(Name:GetText())] == true
+			then
+				HealthBar:Hide()
+				Name:Hide()
+				Level:Hide()
+			end
+			
+			for cName, ____ in ipairs(blacklist["containsName"])
+			do
+				if string.find(string.lower(Name:GetText()), cName)
+				then
+					HealthBar:Hide()
+					Name:Hide()
+					Level:Hide()
+				end
+			end
+			
+			
+			
+			local blacklist = {
+				["exactName"] = {
+					["fire nova totem"] = true
+				},
+				["containsName"] = {
+					-- There is a space before totem so that players with "totem" in the name is not included.
+					[" totem"] = true
+				}
+			}
 			
 
 			local red, green, blue, _ = Name:GetTextColor() --Set Color of Namelabel
