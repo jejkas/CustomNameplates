@@ -61,11 +61,10 @@ function cnpHandleEvent(event) --Handles wow events
 		then
 			if CNP_Data == nil
 			then
-				CNP_Data = 
+				CNP_Data = {};
 				CNP_Data["Players"] = {};
-				
-				addonIsInitilized = true;
 			end
+			addonIsInitialized = true;
 		end
 	end
 	
