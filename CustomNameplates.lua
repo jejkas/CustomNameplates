@@ -5,12 +5,14 @@ local showFriendly  = false
 local showClassIcon = false
 local healthBarWidth = 140;
 local helthBarHeight = 12;
+
+
+local addonIsInitialized = false;
 			
 			
 --Don't edit
 local currentDebuffs = {}
 
-local Players = {}
 local Targets = {}
 
 local Icons = {
@@ -38,7 +40,8 @@ local blacklist = {
 
 function cnpHandleEvent(event) --Handles wow events
 	if event == "PLAYER_ENTERING_WORLD" then
-		if (enableAddOn) then
+		if (enableAddOn)
+		then
 			ShowNameplates()
 			if (showFriendly) then
 				ShowFriendNameplates()
@@ -50,6 +53,20 @@ function cnpHandleEvent(event) --Handles wow events
 			HideFriendNameplates()
 		end
 		deltaUpdate = GetTime()
+	end
+	
+	if event == "ADDON_LOADED" -- Handle on load stuff.
+	then
+		if arg1 == "CustomNameplates"
+		then
+			if CNP_Data == nil
+			then
+				CNP_Data = 
+				CNP_Data["Players"] = {};
+				
+				addonIsInitilized = true;
+			end
+		end
 	end
 	
 	if event == "PLAYER_TARGET_CHANGED" or event == "UNIT_AURA" then
@@ -118,8 +135,8 @@ local function updateDB(name)
 			local class 		  = UnitClass("target")
 			local powerType       = UnitPowerType("target") --0=mana,1=rage,2=energy
 			local powerpercentage = UnitMana("target")/UnitManaMax("target")
-			table.insert(Players, name)
-			Players[name] = {
+			table.insert(CNP_Data["Players"], name)
+			CNP_Data["Players"][name] = {
 								["class"] 			= class,
 								["powertype"]   	= powerType,
 								["powerpercentage"] = powerpercentage,
@@ -135,7 +152,8 @@ end
 function CustomNameplates_OnUpdate()
 	local frames = {WorldFrame:GetChildren()}
 	for _, namePlate in ipairs(frames) do
-		if IsNamePlateFrame(namePlate) and namePlate:IsVisible() then
+		if IsNamePlateFrame(namePlate) and namePlate:IsVisible() and addonIsInitialized
+		then
 			local HealthBar = namePlate:GetChildren()
 			local Border, Glow, Name, Level, _, RaidTargetIcon = namePlate:GetRegions()
 
@@ -296,19 +314,19 @@ function CustomNameplates_OnUpdate()
 			end
 
 			local name = Name:GetText() --Set Name text and saves it in a list
-			if Players[name] == nil and UnitName("target") == nil and string.find(name, "%s") == nil and string.len(name) <= 12 then--and Targets[name] == nil then
+			if CNP_Data["Players"][name] == nil and UnitName("target") == nil and string.find(name, "%s") == nil and string.len(name) <= 12 then--and Targets[name] == nil then
 				updateDB(name)
 				ClearTarget()
 			end
 			
-			if Players[name] ~= nil then
-				HealthBar:SetStatusBarColor(RAID_CLASS_COLORS[string.upper(Players[name]["class"])].r,RAID_CLASS_COLORS[string.upper(Players[name]["class"])].g,RAID_CLASS_COLORS[string.upper(Players[name]["class"])].b,1)
+			if CNP_Data["Players"][name] ~= nil then
+				HealthBar:SetStatusBarColor(RAID_CLASS_COLORS[string.upper(CNP_Data["Players"][name]["class"])].r,RAID_CLASS_COLORS[string.upper(CNP_Data["Players"][name]["class"])].g,RAID_CLASS_COLORS[string.upper(CNP_Data["Players"][name]["class"])].b,1)
 			end
 			
 			--if currently one of the nameplates is an actual player, draw classicon
 			if showClassIcon then
-				if  Players[name] ~= nil and namePlate.classIcon:GetTexture() == "Solid Texture" and string.find(namePlate.classIcon:GetTexture(), "Interface") == nil then
-					namePlate.classIcon:SetTexture(Icons[Players[name]["class"]])
+				if  CNP_Data["Players"][name] ~= nil and namePlate.classIcon:GetTexture() == "Solid Texture" and string.find(namePlate.classIcon:GetTexture(), "Interface") == nil then
+					namePlate.classIcon:SetTexture(Icons[CNP_Data["Players"][name]["class"]])
 					namePlate.classIcon:SetTexCoord(.078, .92, .079, .937)
 					namePlate.classIcon:SetAlpha(0.9)
 					namePlate.classIconBorder:Show()

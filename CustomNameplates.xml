@@ -10,6 +10,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				this:RegisterEvent("PLAYER_ENTERING_WORLD");
 				this:RegisterEvent("PLAYER_TARGET_CHANGED");
 				this:RegisterEvent("UNIT_AURA");
+				this:RegisterEvent("ADDON_LOADED");
 			</OnLoad> 
 			<OnEvent> 
 				cnpHandleEvent(event);
