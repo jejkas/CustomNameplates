@@ -142,8 +142,7 @@ local function updateDB(name)
 							}
 		else
 			IgnoreNames[name] = GetTime();
-		end
-		TargetLastTarget();
+		end		
 	end
 end
 
@@ -314,12 +313,9 @@ function CustomNameplates_OnUpdate()
 			end
 
 			local name = Name:GetText() --Set Name text and saves it in a list
-			if CNP_Data["Players"][name] == nil and string.find(name, "%s") == nil and string.len(name) <= 12 then--and Targets[name] == nil then
-				local localizedClass, englishClass, classIndex = UnitClass("player");
-				if(englishClass ~= "ROGUE" or ((englishClass == "ROGUE" or englishClass == "DRUID") and UnitName("target") == nil))
-				then
-					updateDB(name);
-				end
+			if CNP_Data["Players"][name] == nil and UnitName("target") == nil and string.find(name, "%s") == nil and string.len(name) <= 12 then--and Targets[name] == nil then
+				updateDB(name)
+				ClearTarget()
 			end
 			
 			if CNP_Data["Players"][name] ~= nil then
