@@ -129,6 +129,7 @@ local function updateDB(name)
 	
 	if IgnoreNames[name] == nil or IgnoreNames[name] + 5 < GetTime()
 	then
+		local nameTest = UnitName("Target");
 		TargetByName(name, true)		
 		if UnitIsPlayer("target") then
 			local class 		  = UnitClass("target")
@@ -143,7 +144,14 @@ local function updateDB(name)
 		else
 			IgnoreNames[name] = GetTime();
 		end
-		TargetLastTarget();
+		if nameTest ~= nil
+		then
+			TargetLastTarget();
+		end
+		if nameTest == nil
+		then
+			ClearTarget();
+		end
 	end
 end
 
